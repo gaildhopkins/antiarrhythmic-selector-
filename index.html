@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; script-src 'self' 'unsafe-inline';">
+<title>Antiarrhythmic Drug Selector</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f8f7f4;--surface:#fff;--surface2:#f2f0ec;--border:rgba(0,0,0,.1);--border-strong:rgba(0,0,0,.2);--text:#1a1918;--text2:#5a5754;--text3:#9a9794;--blue-bg:#e8f0fb;--blue-border:#3a7bd5;--blue-text:#1a3d7a;--blue-dark:#0d2550;--red-bg:#fceaea;--red-border:#d94040;--red-text:#7a1a1a;--amber-bg:#fdf3e0;--amber-border:#d97e10;--amber-text:#6b3d04;--green-bg:#eaf4e2;--green-border:#4a9e2a;--green-text:#1f5010;--teal-bg:#e2f5f0;--teal-border:#1a9e78;--teal-text:#0a4d3a;--r:10px;--rs:6px}
+@media(prefers-color-scheme:dark){:root{--bg:#18171a;--surface:#242228;--surface2:#2e2c32;--border:rgba(255,255,255,.1);--border-strong:rgba(255,255,255,.2);--text:#f0eeeb;--text2:#a09ea0;--text3:#706e70;--blue-bg:#0e1e3a;--blue-border:#3a7bd5;--blue-text:#90b8f0;--blue-dark:#c0d8f8;--red-bg:#2a1010;--red-border:#c04040;--red-text:#f0a0a0;--amber-bg:#2a1e08;--amber-border:#c07010;--amber-text:#f0c070;--green-bg:#0e2010;--green-border:#3a8020;--green-text:#90d070;--teal-bg:#0a2018;--teal-border:#148060;--teal-text:#70d0b0}}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+.site-header{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.header-inner{max-width:920px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:12px}
+.hicon{width:36px;height:36px;background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:var(--rs);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.htxt h1{font-size:15px;font-weight:600;color:var(--text);letter-spacing:-.01em}
+.htxt p{font-size:12px;color:var(--text2);margin-top:1px}
+.hbadge{margin-left:auto;font-size:11px;font-weight:500;padding:3px 8px;border-radius:20px;background:var(--blue-bg);color:var(--blue-text);border:1px solid var(--blue-border);white-space:nowrap}
+.main{max-width:920px;margin:0 auto;padding:24px}
+.steps{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+.sc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.sh{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.sn{width:24px;height:24px;border-radius:50%;background:var(--blue-bg);border:1px solid var(--blue-border);font-size:11px;font-weight:600;color:var(--blue-text);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.st{font-size:13px;font-weight:500;color:var(--text)}
+.bg{display:flex;flex-wrap:wrap;gap:7px}
+.ob{font-family:'Inter',sans-serif;font-size:13px;font-weight:400;padding:8px 14px;border-radius:var(--rs);border:1px solid var(--border-strong);background:var(--surface);color:var(--text);cursor:pointer;transition:background .12s,border-color .12s,transform .08s;line-height:1.3}
+.ob:hover{background:var(--surface2)}
+.ob:active{transform:scale(.97)}
+.ob.sel{background:var(--blue-bg);border-color:var(--blue-border);color:var(--blue-dark);font-weight:500}
+.results{display:none}
+.results.vis{display:block}
+.rh{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.rh h2{font-size:15px;font-weight:600;color:var(--text)}
+.arlbl{font-size:12px;padding:3px 10px;border-radius:20px;background:var(--teal-bg);color:var(--teal-text);border:1px solid var(--teal-border);font-weight:500}
+.slbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin:18px 0 8px}
+.slbl:first-of-type{margin-top:0}
+.dc{border-radius:var(--r);border:1px solid var(--border);padding:14px 16px;margin-bottom:8px;background:var(--surface);box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.dc.first{border-left:3px solid var(--blue-border)}
+.dc.second{border-left:3px solid var(--amber-border)}
+.dc.avoid{border-left:3px solid var(--red-border);opacity:.85}
+.dc.alt{border-left:3px solid var(--green-border)}
+.dtop{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px}
+.dn{font-size:14px;font-weight:600;color:var(--text);letter-spacing:-.01em}
+.tb{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0;letter-spacing:.04em;text-transform:uppercase}
+.tb.first{background:var(--blue-bg);color:var(--blue-text);border:1px solid var(--blue-border)}
+.tb.second{background:var(--amber-bg);color:var(--amber-text);border:1px solid var(--amber-border)}
+.tb.avoid{background:var(--red-bg);color:var(--red-text);border:1px solid var(--red-border)}
+.tb.alt{background:var(--green-bg);color:var(--green-text);border:1px solid var(--green-border)}
+.dd{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--text2);margin-bottom:6px;line-height:1.65;white-space:pre-wrap}
+.dnote{font-size:12.5px;color:var(--text2);line-height:1.6}
+.dev{font-size:10.5px;font-style:italic;color:var(--text3);margin-top:5px}
+.al{border-radius:var(--rs);padding:11px 14px;font-size:12.5px;line-height:1.6;margin-bottom:10px;display:flex;gap:8px;align-items:flex-start}
+.al-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+.al.info{background:var(--blue-bg);color:var(--blue-text);border:1px solid var(--blue-border)}
+.al.warn{background:var(--amber-bg);color:var(--amber-text);border:1px solid var(--amber-border)}
+.al.danger{background:var(--red-bg);color:var(--red-text);border:1px solid var(--red-border)}
+.al.ok{background:var(--green-bg);color:var(--green-text);border:1px solid var(--green-border)}
+hr.div{border:none;border-top:1px solid var(--border);margin:14px 0}
+.reset-bar{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.rbtn{font-family:'Inter',sans-serif;font-size:12px;font-weight:500;padding:6px 12px;border-radius:var(--rs);border:1px solid var(--border-strong);background:transparent;color:var(--text2);cursor:pointer;transition:background .12s}
+.rbtn:hover{background:var(--surface2)}
+.disc{font-size:11px;color:var(--text3)}
+.src{margin-top:32px;padding-top:20px;border-top:1px solid var(--border)}
+.src h3{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px}
+.src ul{list-style:none;display:flex;flex-direction:column;gap:4px}
+.src li{font-size:12px;color:var(--text2);padding-left:14px;position:relative}
+.src li::before{content:'·';position:absolute;left:4px;color:var(--text3)}
+@media(max-width:600px){.main{padding:14px}.header-inner{padding:10px 14px}.ob{font-size:12px;padding:7px 11px}}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="hicon">&#9829;</div>
+    <div class="htxt">
+      <h1>Antiarrhythmic Drug Selector</h1>
+      <p>Evidence-based pharmacotherapy decision support</p>
+    </div>
+    <span class="hbadge">Clinical Reference</span>
+  </div>
+</header>
+
+<main class="main">
+<div class="steps">
+
+  <div class="sc">
+    <div class="sh"><div class="sn">1</div><span class="st">Select arrhythmia category</span></div>
+    <div class="bg" id="g-cat">
+      <button class="ob" onclick="selCat('atrial')">Atrial / supraventricular</button>
+      <button class="ob" onclick="selCat('ventricular')">Ventricular</button>
+      <button class="ob" onclick="selCat('brady')">Bradyarrhythmia</button>
+    </div>
+  </div>
+
+  <div class="sc" id="p-atrial" style="display:none">
+    <div class="sh"><div class="sn">2</div><span class="st">Select arrhythmia type</span></div>
+    <div class="bg" id="g-atype">
+      <button class="ob" onclick="selAType('af_rate')">AF / AFL — rate control</button>
+      <button class="ob" onclick="selAType('af_rhythm')">AF / AFL — rhythm control</button>
+      <button class="ob" onclick="selAType('avnrt')">AVNRT (paroxysmal SVT)</button>
+      <button class="ob" onclick="selAType('avrt_wpw')">AVRT / WPW with AF</button>
+    </div>
+  </div>
+
+  <div class="sc" id="p-vent" style="display:none">
+    <div class="sh"><div class="sn">2</div><span class="st">Select arrhythmia type</span></div>
+    <div class="bg" id="g-vtype">
+      <button class="ob" onclick="selVType('pvt_vf')">Pulseless VT / VF</button>
+      <button class="ob" onclick="selVType('stable_vt')">Stable (haemodynamic) VT</button>
+      <button class="ob" onclick="selVType('tdp')">Torsades de pointes (TdP)</button>
+      <button class="ob" onclick="selVType('pvc')">Frequent PVCs</button>
+      <button class="ob" onclick="selVType('wct')">Undifferentiated WCT</button>
+    </div>
+  </div>
+
+  <div class="sc" id="p-brady" style="display:none">
+    <div class="sh"><div class="sn">2</div><span class="st">Select bradyarrhythmia type</span></div>
+    <div class="bg" id="g-btype">
+      <button class="ob" onclick="selBType('sinus_brady')">Sinus bradycardia</button>
+      <button class="ob" onclick="selBType('av_block1')">1st-degree AV block</button>
+      <button class="ob" onclick="selBType('av_block2')">2nd-degree AV block</button>
+      <button class="ob" onclick="selBType('av_block3')">3rd-degree / complete heart block</button>
+      <button class="ob" onclick="selBType('post_transplant')">Post-cardiac transplant / SCI</button>
+    </div>
+  </div>
+
+  <div class="sc" id="p-actx" style="display:none">
+    <div class="sh"><div class="sn">3</div><span class="st">Select patient context</span></div>
+    <div class="bg" id="g-actx">
+      <button class="ob" onclick="selACtx('normal')">No SHD / normal EF</button>
+      <button class="ob" onclick="selACtx('hfref')">HFrEF / reduced EF</button>
+      <button class="ob" onclick="selACtx('adhf')">Acute decompensated HF</button>
+      <button class="ob" onclick="selACtx('shd')">Structural heart disease</button>
+      <button class="ob" onclick="selACtx('unstable')">Haemodynamically unstable</button>
+    </div>
+  </div>
+
+  <div class="sc" id="p-vctx" style="display:none">
+    <div class="sh"><div class="sn">3</div><span class="st">Select additional context</span></div>
+    <div class="bg" id="g-vctx">
+      <button class="ob" onclick="selVCtx('std')">Standard (no special factors)</button>
+      <button class="ob" onclick="selVCtx('ref_vf')">Refractory VF (&#8805;3 shocks + amio)</button>
+      <button class="ob" onclick="selVCtx('post_mi')">Post-MI</button>
+      <button class="ob" onclick="selVCtx('icd_prev')">ICD — chronic prevention</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="reset-bar">
+  <button class="rbtn" onclick="resetAll()">&#8634; Reset</button>
+  <span class="disc">For clinical reference only. Always verify doses and contraindications independently.</span>
+</div>
+
+<div class="results" id="results"></div>
+
+<div class="src">
+  <h3>Evidence sources</h3>
+  <ul>
+    <li>Ray L, Geier C, DeWitt KM. Pathophysiology and treatment of adults with arrhythmias in the ED, Part 1: Atrial arrhythmias. <em>Am J Health-Syst Pharm.</em> 2023;80:1039&#8211;1055.</li>
+    <li>Ray L, Geier C, DeWitt KM. Pathophysiology and treatment of adults with arrhythmias in the ED, Part 2: Ventricular and bradyarrhythmias. <em>Am J Health-Syst Pharm.</em> 2023;80:1123&#8211;1136.</li>
+    <li>Merino JL, Tamargo J, et al. Practical compendium of antiarrhythmic drugs: ESC/EHRA Clinical Consensus Statement. <em>EP Europace.</em> 2025;27(8):euaf076.</li>
+    <li>Panchal AR, et al. 2020 AHA Guidelines for CPR and Emergency Cardiovascular Care &#8212; Adult ACLS. <em>Circulation.</em> 2020;142(suppl 2):S366&#8211;S468.</li>
+    <li>Al-Khatib SM, et al. 2017 AHA/ACC/HRS Guideline for Management of Ventricular Arrhythmias and Prevention of SCD. <em>J Am Coll Cardiol.</em> 2018;72(14):e91&#8211;e220.</li>
+    <li>Andrade JG, et al. 2020 CCS/CHRS Comprehensive Guidelines for Management of Atrial Fibrillation. <em>Can J Cardiol.</em> 2020;36(12):1847&#8211;1948.</li>
+    <li>Kusumoto FM, et al. 2018 ACC/AHA/HRS Guideline on Bradycardia and Cardiac Conduction Delay. <em>Circulation.</em> 2019;140(8):e382&#8211;e482.</li>
+  </ul>
+</div>
+</main>
+
+<script>
+var S={cat:null,aType:null,aCtx:null,vType:null,vCtx:null,bType:null};
+function show(id){var e=document.getElementById(id);if(e)e.style.display='block';}
+function hide(id){var e=document.getElementById(id);if(e)e.style.display='none';}
+function clrSel(id){var e=document.getElementById(id);if(!e)return;e.querySelectorAll('.ob').forEach(function(b){b.classList.remove('sel');});}
+function mkSel(gid,vals,val){var idx=vals.indexOf(val);document.getElementById(gid).querySelectorAll('.ob').forEach(function(b,i){b.classList.toggle('sel',i===idx);});}
+function mkSelI(gid,idx){document.getElementById(gid).querySelectorAll('.ob').forEach(function(b,i){b.classList.toggle('sel',i===idx);});}
+
+function selCat(c){
+  S={cat:c,aType:null,aCtx:null,vType:null,vCtx:null,bType:null};
+  mkSelI('g-cat',{atrial:0,ventricular:1,brady:2}[c]);
+  ['p-atrial','p-vent','p-brady','p-actx','p-vctx'].forEach(hide);
+  ['g-atype','g-vtype','g-btype','g-actx','g-vctx'].forEach(clrSel);
+  clrRes();
+  if(c==='atrial')show('p-atrial');
+  else if(c==='ventricular')show('p-vent');
+  else show('p-brady');
+}
+function selAType(t){
+  S.aType=t;S.aCtx=null;
+  mkSel('g-atype',['af_rate','af_rhythm','avnrt','avrt_wpw'],t);
+  hide('p-actx');clrSel('g-actx');
+  if(t==='avnrt'||t==='avrt_wpw'){render();}
+  else{show('p-actx');clrRes();}
+}
+function selACtx(c){S.aCtx=c;mkSel('g-actx',['normal','hfref','adhf','shd','unstable'],c);render();}
+function selVType(t){
+  S.vType=t;S.vCtx=null;
+  mkSel('g-vtype',['pvt_vf','stable_vt','tdp','pvc','wct'],t);
+  hide('p-vctx');clrSel('g-vctx');
+  if(t==='pvc'||t==='wct'){render();}
+  else{show('p-vctx');clrRes();}
+}
+function selVCtx(c){S.vCtx=c;mkSel('g-vctx',['std','ref_vf','post_mi','icd_prev'],c);render();}
+function selBType(t){S.bType=t;mkSel('g-btype',['sinus_brady','av_block1','av_block2','av_block3','post_transplant'],t);render();}
+function resetAll(){
+  S={cat:null,aType:null,aCtx:null,vType:null,vCtx:null,bType:null};
+  ['g-cat','g-atype','g-vtype','g-btype','g-actx','g-vctx'].forEach(clrSel);
+  ['p-atrial','p-vent','p-brady','p-actx','p-vctx'].forEach(hide);
+  clrRes();
+}
+function clrRes(){var r=document.getElementById('results');r.innerHTML='';r.classList.remove('vis');}
+
+function d(name,tier,dose,note,ev){
+  var lbl={first:'1st line',second:'2nd line',avoid:'Avoid',alt:'Consider'}[tier]||tier;
+  return '<div class="dc '+tier+'"><div class="dtop"><div class="dn">'+name+'</div><span class="tb '+tier+'">'+lbl+'</span></div>'
+    +(dose?'<div class="dd">'+dose+'</div>':'')
+    +(note?'<div class="dnote">'+note+'</div>':'')
+    +(ev?'<div class="dev">'+ev+'</div>':'')
+    +'</div>';
+}
+function al(type,icon,msg){return'<div class="al '+type+'"><span class="al-icon">'+icon+'</span><span>'+msg+'</span></div>';}
+function sl(txt){return'<div class="slbl">'+txt+'</div>';}
+function dv(){return'<hr class="div">';}
+
+function getLabel(){
+  var m={af_rate:'AF/AFL &mdash; Rate control',af_rhythm:'AF/AFL &mdash; Rhythm control',avnrt:'AVNRT (pSVT)',avrt_wpw:'AVRT / WPW + AF',pvt_vf:'Pulseless VT / VF',stable_vt:'Stable VT',tdp:'Torsades de pointes',pvc:'Frequent PVCs',wct:'Undifferentiated WCT',sinus_brady:'Sinus bradycardia',av_block1:'1st-degree AV block',av_block2:'2nd-degree AV block',av_block3:'Complete heart block',post_transplant:'Post-transplant / SCI bradycardia'};
+  var cm={normal:'No SHD / Normal EF',hfref:'HFrEF',adhf:'Acute decompensated HF',shd:'Structural heart disease',unstable:'Haemodynamically unstable',std:'Standard',ref_vf:'Refractory VF',post_mi:'Post-MI',icd_prev:'ICD prevention'};
+  var t=S.aType||S.vType||S.bType;
+  var c=S.aCtx||S.vCtx;
+  return (m[t]||'')+(c?' &mdash; '+cm[c]:'');
+}
+
+function atrialRec(){
+  var t=S.aType,c=S.aCtx,h='';
+  if(t==='avnrt'){
+    h+=al('info','&#9432;','<strong>Non-pharmacological first:</strong> Valsalva or modified Valsalva manoeuvre (28&ndash;50% effective). Proceed to pharmacotherapy if ineffective.');
+    h+=sl('First-line pharmacotherapy');
+    h+=d('Adenosine','first','6 mg IV rapid push; if no effect &rarr; 12 mg; may repeat once.\nDilute in ~20 mL NS &mdash; single-syringe technique preferred.','~90% effective. Renders AV node transiently refractory (~20 s). Dose reduce: 3 mg via central line; 12 mg if recent caffeine; 1.5 mg post-heart transplant.','AHA 2020 ACLS; ACC/AHA/HRS SVT Guideline 2015');
+    h+=sl('Second-line / alternatives');
+    h+=d('Diltiazem (non-DHP CCB)','second','0.25 mg/kg IV push; repeat 0.35 mg/kg after 15 min.\nInfusion: 5&ndash;15 mg/h.','~90% conversion but slower onset (~394 s vs 44 s) than adenosine. Lower hypotension risk than verapamil.','Cochrane review 2017 (7 RCTs, n=622)');
+    h+=d('Verapamil (non-DHP CCB)','second','5&ndash;10 mg slow IV (&#8805;2 min); repeat 10 mg in 30 min.','Comparable efficacy to diltiazem. Higher hypotension risk &mdash; pre-treat with IV calcium gluconate 1 g.','Multiple RCTs; Cochrane 2017');
+    h+=d('Esmolol (&beta;-blocker)','second','500 &mu;g/kg bolus over 1 min; infusion 50&ndash;300 &mu;g/kg/min.','Less evidence than CCBs. Single RCT showed inferior conversion vs diltiazem (terminated early).','Gupta et al. 1999');
+    h+=al('warn','&#9888;','If haemodynamically unstable: synchronised DCCV. For recurrent/bothersome AVNRT: catheter ablation is the preferred definitive therapy.');
+  }
+  else if(t==='avrt_wpw'){
+    h+=al('danger','&#128683;','<strong>WPW + AF &mdash; AVOID all AV nodal blockers.</strong> Adenosine, diltiazem, verapamil, beta-blockers, digoxin, and amiodarone* may accelerate conduction via the accessory pathway and precipitate VF. Irregular wide complex tachycardia in known WPW = WPW + AF until proven otherwise.');
+    h+=sl('Recommended pharmacotherapy');
+    h+=d('Procainamide IV (Class 1A)','first','1,000 mg IV over 60 min (Ottawa Protocol);\nor 15 mg/kg over 30 min (RAFF-2).\nMaintenance: 2&ndash;6 mg/min.','Drug of choice for WPW + AF. No AV nodal blocking activity &mdash; slows both normal and accessory pathway conduction. Stop if QRS widens >50% or hypotension. Hypotension in 5&ndash;10% (fluid bolus 250&ndash;500 mL).','Ottawa Protocol; RAFF-2 (Stiell 2020)');
+    h+=d('Ibutilide IV (Class III)','first','&#60;60 kg: 0.01 mg/kg IV over 10 min;\n&#8805;60 kg: 1 mg over 10 min. Repeat &times;1 after 10 min.','Effective for WPW + AF. Replete K&#x207a; and Mg&#x00B2;&#x207a; before use. Monitor for TdP for 4 h post-infusion. Avoid if QTc >440 ms, reduced LVEF, or MI.','ESC EHRA Compendium 2025');
+    h+=al('warn','&#9888;','*Amiodarone: traditionally avoided (AV nodal properties + case reports of VF). Small retrospective study (n=27) showed 60% cardioversion without VF &mdash; insufficient evidence to routinely recommend. Unstable patient: emergent synchronised DCCV.');
+  }
+  else if(t==='af_rate'){
+    if(!c){h+=al('info','&#9432;','Select patient context above to see tailored recommendations.');return h;}
+    if(c==='unstable'){h+=al('danger','&#128683;','Haemodynamically unstable AF/AFL: <strong>emergent synchronised DCCV regardless of duration.</strong> Pharmacological rate control risks further haemodynamic compromise.');return h;}
+    h+=al('info','&#9432;','<strong>Rate target:</strong> Resting HR &#8804;100&ndash;110 bpm (lenient). Stricter &#8804;80 bpm if persistent symptoms despite lenient control (RACE II trial).');
+    if(c==='normal'||c==='shd'){
+      h+=sl('First-line agents');
+      h+=d('Metoprolol IV (&beta;-blocker)','first','5 mg IV push over 2 min; repeat q5 min &times;3 (total 15 mg).\nOr 0.15 mg/kg (max 10 mg) in 50 mL over 30&ndash;60 min.\nTransition: oral metoprolol 25&ndash;50 mg (IV:oral 1:2.5 ratio).','First-line. Similar BP and hypotension vs diltiazem in retrospective data. Preferred when long-term &beta;-blocker therapy indicated.','Fromm 2015; Demircan 2005; Nicholson 2020');
+      h+=d('Diltiazem IV (non-DHP CCB)','first','0.25 mg/kg IV push; repeat 0.35 mg/kg after 15 min.\nInfusion: 5&ndash;15 mg/h (max 24 h).\nAlternative: fixed-dose 10&ndash;20 mg IV push.','More rapid and durable rate control than metoprolol in most studies. Add oral diltiazem 30&ndash;60 mg as IV rate controlled.','Lan 2022 meta-analysis');
+      h+=d('Verapamil IV (non-DHP CCB)','second','5&ndash;10 mg slow IV; repeat 10 mg in 30 min.\nInfusion: 5&ndash;20 mg/h.','Comparable to diltiazem. Higher hypotension risk. Pre-treat with IV calcium gluconate.','Aggarwal 2020');
+    }
+    else if(c==='hfref'){
+      h+=al('warn','&#9888;','<strong>HFrEF:</strong> Non-DHP CCBs traditionally avoided (negative inotropy). Beta-blockers provide long-term mortality benefit (MERIT-HF, CIBIS, COPERNICUS) &mdash; preferred if haemodynamically tolerated. Recent evidence supports reassessing diltiazem in stable HFrEF + AF.');
+      h+=d('Metoprolol IV (&beta;-blocker)','first','5 mg IV q5 min &times;3. Initiate oral metoprolol succinate concurrently.','Preferred in HFrEF for long-term survival benefit.','MERIT-HF; CIBIS; COPERNICUS');
+      h+=d('Digoxin IV','second','0.5 mg IV bolus, then 0.25 mg q6h (total 1.0&ndash;1.5 mg/24 h).\nRenal adjustment if CrCl &#8804;20 mL/min: loading 0.25 mg q6h &times;2 doses, then 0.125 mg daily.','Only AV nodal blocker with positive inotropy &mdash; useful in ADHF or PAH. Slow onset (peak 2&ndash;6 h). Chronic use associated with increased mortality.','Ouyang 2015 meta-analysis');
+    }
+    else if(c==='adhf'){
+      h+=al('danger','&#128683;','Acute decompensated HF: negative inotropes risk further haemodynamic compromise. Treat underlying cause of AF. If rate control essential:');
+      h+=d('Digoxin IV','first','0.5 mg IV bolus then 0.25 mg q6h.','Positive inotropy uniquely beneficial in ADHF. Slow onset limits acute effectiveness.','AHA/ACC/HRS 2014; CCS 2020');
+      h+=d('Amiodarone IV','second','150 mg IV over 10&ndash;15 min; then 1 mg/min &times;6 h, then 0.5 mg/min &times;18 h.','Rate control via &beta;-adrenergic and Ca&#xB2;&#x207a; channel antagonism in critically ill. Polysorbate-80 (solvent) may contribute to haemodynamic instability.','AJHP 2023; ESC EHRA 2025');
+    }
+    h+=dv();
+    h+=al('ok','&#10022;','<strong>IV Magnesium:</strong> 2&ndash;4.5 g IV over 1&ndash;2 h as adjunct (regardless of serum Mg&#xB2;&#x207a; levels). Meta-analyses: magnesium more than doubled rate-control success vs comparator. LOMAGHI trial: 4.5 g equivalent to 9 g with fewer adverse effects.');
+  }
+  else if(t==='af_rhythm'){
+    if(!c){h+=al('info','&#9432;','Select patient context above to see tailored recommendations.');return h;}
+    if(c==='unstable'){h+=al('danger','&#128683;','Haemodynamically unstable: <strong>emergent synchronised DCCV immediately.</strong> Do not delay for antiarrhythmic pre-treatment or sedation in an unstable patient.');return h;}
+    h+=al('info','&#9432;','<strong>48-hour rule &amp; anticoagulation:</strong> Rhythm control preferred if onset &#60;48 h. Initiate anticoagulation before cardioversion. If >48 h or unknown duration: anticoagulate &#8805;3 weeks OR TEE to exclude LA thrombus. Continue OAC &#8805;4 weeks post-cardioversion regardless of CHA&#x2082;DS&#x2082;-VASc score.');
+    if(c==='normal'){
+      h+=sl('First-line options &mdash; no SHD');
+      h+=d('Procainamide IV (Class 1A)','first','1,000 mg IV over 60 min (Ottawa Protocol);\nor 15 mg/kg over 30 min (RAFF-2).\nMaintenance: 2&ndash;6 mg/min.','50&ndash;60% effective for AF; 28% for AFL. Stop if QRS >50% widening. Active metabolite NAPA (K&#x207a; channel blocker) prolongs QT &mdash; dose-reduce in renal insufficiency. Avoid in Brugada syndrome.','Ottawa Protocol (Stiell 2010); RAFF-2 (Stiell 2020)');
+      h+=d('Flecainide PO (Class 1C)','first','&#60;70 kg: 200 mg &times;1 oral; &#8805;70 kg: 300 mg &times;1 oral.\nOnset 30&ndash;60 min.','Pill-in-pocket for paroxysmal AF. Give &beta;-blocker or CCB 30 min prior to avoid 1:1 AFL with RVR. Contraindicated in SHD. CYP2D6 &mdash; reduce dose in CrCl &#60;35 mL/min.','EAST-AFNET 4 (Kirchhof 2020)');
+      h+=d('Propafenone PO (Class 1C)','first','&#60;70 kg: 450 mg &times;1 oral; &#8805;70 kg: 600 mg &times;1 oral.\nOnset 30&ndash;60 min.','Same considerations as flecainide. CYP2D6/3A4/1A2 &mdash; active metabolites renally excreted.','EAST-AFNET 4 (Kirchhof 2020)');
+      h+=d('Ibutilide IV (Class III)','first','&#8805;60 kg: 1 mg IV over 10 min; &#60;60 kg: 0.01 mg/kg. Repeat &times;1 after 10 min.','AFL: 50&ndash;75% effective; AF: 30&ndash;55%. Replete K&#x207a;/Mg&#xB2;&#x207a; first. Prophylactic Mg&#xB2;&#x207a; &#8805;4 g improves conversion and reduces TdP risk. Avoid if QTc >440 ms, low EF, or MI.','Stambler 1996; Volgman 1998; Vinson 2018');
+      h+=d('Amiodarone IV (Class III)','second','150 mg IV over 10&ndash;15 min; infusion 1 mg/min &times;6 h, then 0.5 mg/min &times;18 h.','Second-line &mdash; delayed cardioversion (median 420 min vs 55 min for 1C agents; inferior at 2&ndash;8 h, similar at 24 h). Use when 1C contraindicated. Low TdP risk.','Chevalier 2003 meta-analysis; Bonora 2017');
+      h+=d('DCCV (electrical cardioversion)','first','Synchronised shock &mdash; &#8805;90% efficacy.\nReduces ED length of stay vs pharmacological approach.','Requires procedural sedation. Short-acting haemodynamically neutral agent preferred.','RAFF-2 (Stiell 2020)');
+    }
+    else{
+      h+=al('danger','&#128683;','<strong>Class 1C agents CONTRAINDICATED</strong> in SHD / HFrEF / ischaemic heart disease / valvular disease (CAST trial: flecainide/encainide &#8593; mortality post-MI despite PVC suppression; SWORD trial: d-sotalol &#8593; mortality post-MI).');
+      h+=sl('Recommended in SHD / HFrEF');
+      h+=d('Amiodarone IV &rarr; oral (Class III)','first','IV: 150 mg over 10&ndash;15 min then infusion.\nOral maintenance: 200&ndash;400 mg/day.','Safest pharmacological option in SHD/HFrEF. Low TdP risk despite QT prolongation. Toxicity monitoring required: PFTs, TFTs, LFTs, slit-lamp exam annually.','Roy 2008 (AF-CHF); Singh 2005 (SAFE-T)');
+      h+=d('Procainamide IV (Class 1A)','second','1,000 mg IV over 60 min.','Can be used in mild-moderate SHD. Monitor QRS and BP. Avoid in severe LV dysfunction.','AJHP 2023 Part 1');
+      h+=d('DCCV (electrical cardioversion)','first','Synchronised shock &mdash; &#8805;90% efficacy.','Preferred in SHD to minimise cumulative antiarrhythmic exposure.','ACC/AHA/HRS Guideline');
+    }
+  }
+  return h;
+}
+
+function ventRec(){
+  var t=S.vType,c=S.vCtx,h='';
+  if(t==='pvc'){
+    h+=al('info','&#9432;','<strong>Frequent PVCs:</strong> Intervention not required unless symptomatic, haemodynamically significant, increasing in frequency, or causing PVC-induced cardiomyopathy (burden >15&ndash;20%).');
+    h+=sl('Pharmacotherapy');
+    h+=d('Beta-blockers (oral)','first','Metoprolol succinate 25&ndash;200 mg/day;\nor Carvedilol 3.125&ndash;25 mg BID.','First-line for chronic PVC suppression &mdash; blunt sympathetic activity, slow cardiac remodelling. Preferred in HFrEF or ischaemic heart disease.','AHA/ACC/HRS VA Guideline 2017');
+    h+=d('Amiodarone (oral)','second','200&ndash;400 mg/day maintenance after loading.','Reserve for refractory symptomatic PVCs with SHD. Multi-organ toxicity with long-term use requires monitoring.','AHA/ACC/HRS 2017');
+    h+=d('Flecainide / Propafenone (Class 1C)','second','Flecainide 50&ndash;150 mg BID; Propafenone 150&ndash;300 mg TID.','Effective PVC suppression &mdash; use ONLY in patients without SHD or significant ischaemic heart disease.','AHA/ACC/HRS 2017');
+    h+=al('danger','&#128683;','<strong>Class 1C agents post-MI: CONTRAINDICATED.</strong> CAST trial (Echt 1991): encainide/flecainide increased mortality 2.5&times; despite effective PVC suppression post-MI.');
+  }
+  else if(t==='wct'){
+    h+=al('danger','&#128683;','<strong>Unstable WCT: assume VT &mdash; synchronised DCCV immediately.</strong> Do not delay for ECG interpretation or pharmacotherapy.');
+    h+=sl('Stable WCT &mdash; diagnostic / therapeutic');
+    h+=d('Adenosine IV (diagnostic + therapeutic)','first','6 mg IV rapid push + large NS flush;\n12 mg if no effect.','Diagnostic: Terminates &rarr; likely AVNRT with aberrancy. Slows &rarr; reveals AF or AFL. No effect &rarr; VT more likely. Preparation time and hypotension risk may delay definitive DCCV.','Moccetti 2022 (Basel algorithm); AJHP 2023 Part 2');
+    h+=d('Procainamide IV (Class 1A)','alt','100 mg IV over 5 min q10 min to 17 mg/kg;\nor 10 mg/kg over 20 min.\nMaintenance: 1&ndash;4 mg/min.','Effective for both VT and SVT with aberrancy. Reasonable for stable regular WCT. Avoid in severe LV dysfunction or Brugada syndrome.','PROCAMIO trial; AJHP 2023');
+  }
+  else if(t==='pvt_vf'){
+    if(!c){h+=al('info','&#9432;','Select additional context above.');return h;}
+    h+=al('danger','&#128683;','<strong>Priority: High-quality CPR + early defibrillation.</strong> Antiarrhythmics are adjuncts only. Administer after &#8805;1 defibrillation attempt (standard protocols: after 3 unsuccessful shocks). AHA Class IIb recommendation (Level B-R).');
+    if(c==='std'||c==='post_mi'){
+      h+=sl('AHA/ESC recommended agents');
+      h+=d('Amiodarone IV (Class III)','first','300 mg IV/IO push after &#8805;1 defibrillation;\nthen 150 mg after additional DCCV if needed (max 450 mg bolus).\nPost-ROSC infusion: 1 mg/min &times;6 h, then 0.5 mg/min &times;18 h.','ARREST trial: survival to hospital admission 44% vs 34% placebo (p=0.03). ALPS trial: &#8593; survival in bystander-witnessed cardiac arrest (27.7% vs 22.7% placebo, p=0.05). Earlier administration &rarr; &#8593; ROSC (post-hoc). Polysorbate-free formulation preferred.','ARREST (Kudenchuk 1999); ALIVE (Dorian 2002); ALPS (Kudenchuk 2016)');
+      h+=d('Lidocaine IV (Class 1B)','second','1&ndash;1.5 mg/kg IV/IO; repeat q5 min to max 3 mg/kg.\nPost-ROSC infusion: 1&ndash;4 mg/min.','Alternative to amiodarone &mdash; re-added to AHA/ESC guidelines after ALPS trial (27.8% survival vs 22.7% placebo). ALIVE: amiodarone superior for hospital admission (23% vs 12%). Advantages: rapid push, prefilled syringes, minimal hypotension. Potential neuroprotective effect.','ALPS (Kudenchuk 2016); Wagner 2022; ALIVE (Dorian 2002)');
+      h+=d('Procainamide IV','avoid','&mdash;','NOT recommended for pVT/VF. Markel 2010 (n=665 OHCA): &#8595; hospital admission (45.5% vs 62.4%) and survival to discharge (18.4% vs 31.9%). Removed from AHA ACLS algorithms.','Markel 2010; AHA ACLS 2020');
+      if(c==='post_mi')h+=al('warn','&#9888;','Post-MI: lidocaine NOT for prophylaxis &mdash; meta-analysis (Hine 1989) shows harmful trend with prophylactic use. Use only as alternative to amiodarone for pVT/VF.');
+    }
+    else if(c==='ref_vf'){
+      h+=al('warn','&#9888;','<strong>Refractory VF:</strong> Persistent VF after &#8805;3 mg epinephrine + 3 defibrillations + 300 mg amiodarone. Probable mechanism: catecholamine-driven electrical storm.');
+      h+=d('Amiodarone IV','first','300 mg IV push + 150 mg after additional DCCV.','Continue standard ACLS. Ensure adequate epinephrine before escalation.','AHA ACLS 2020');
+      h+=d('Esmolol IV (&beta;-blocker)','second','500 &mu;g/kg bolus over 1 min;\ninfusion 50&ndash;200 &mu;g/kg/min.','Rationale: catecholamine-excess electrical storm &rarr; &beta;-blockade. Two observational studies (Driver 2014; Lee 2016) show &#8593; ROSC. One prehospital feasibility RCT (Patrick 2022): &#8593; ROSC trend, not statistically significant. Evidence limited to retrospective single-centre studies. Not in AHA 2020 ACLS guidelines.','Driver 2014; Lee 2016; Patrick 2022; Miraglia 2020 meta-analysis');
+      h+=al('info','&#9432;','<strong>Non-pharmacological options:</strong> (1) Ultrasound-guided left stellate ganglion block. (2) Vector change / double sequential defibrillation (DOSE VF trial 2022). (3) ECPR (extracorporeal CPR) where resources available.');
+    }
+    else if(c==='icd_prev'){
+      h+=sl('Chronic ICD shock suppression');
+      h+=d('Amiodarone (oral)','first','Oral maintenance: 200&ndash;400 mg/day after loading.','Gold standard for ICD shock suppression. Scheduled toxicity monitoring required: PFTs, TFTs, LFTs, ophthalmology.','AHA/ACC/HRS VA Guideline 2017');
+      h+=d('Sotalol (oral, Class III)','second','80&ndash;160 mg BID (max 320 mg/day).\nAdjust in renal dysfunction (&#8595;dose or &#8593;interval if CrCl &#60;60 mL/min).','Alternative to amiodarone. &beta;-blocking property provides additional benefit. Monitor QTc. Consider in-hospital initiation.','Mason 1993 (ESVEM); AHA/ACC/HRS 2017');
+      h+=d('Mexiletine (oral, Class 1B)','second','150&ndash;300 mg TID with food.','Oral lidocaine analogue. Bridge for patients responding to IV lidocaine post-ROSC. Adjunct to amiodarone in refractory VT.','AJHP 2023 Part 2; ESC EHRA 2025');
+      h+=al('info','&#9432;','<strong>VANISH trial (Sapp 2016):</strong> Catheter ablation of VT superior to antiarrhythmic drug escalation for composite outcome at 2 years. Consider early referral for catheter ablation in patients with recurrent ICD shocks.');
+    }
+  }
+  else if(t==='stable_vt'){
+    if(!c){h+=al('info','&#9432;','Select additional context above.');return h;}
+    h+=al('warn','&#9888;','<strong>Limited evidence base:</strong> Only 4 RCTs (total 245 patients) of antiarrhythmics for stable monomorphic VT published since 1988. PROCAMIO trial (n=62): procainamide superior to amiodarone (67% vs 38% termination; adverse events 9% vs 41%). Synchronised DCCV remains definitive &mdash; do not delay unnecessarily.');
+    h+=d('Procainamide IV (Class 1A)','first','100 mg IV over 5 min q10 min to 17 mg/kg;\nor 10 mg/kg over 20 min (PROCAMIO protocol).\nMaintenance: 1&ndash;4 mg/min.','60&ndash;70% cardioversion rate. AHA/ACC/HRS 2017: Class IIa ("can be useful"). Stop if arrhythmia terminates or hypotension. NAPA (active metabolite) accumulates in renal insufficiency.','PROCAMIO (Ortiz 2017); Gorgels 1996; Komura 2010; AHA/ACC/HRS 2017');
+    h+=d('Amiodarone IV (Class III)','second','150 mg IV over 10&ndash;15 min;\ninfusion 1 mg/min &times;6 h, then 0.5 mg/min &times;18 h.','25&ndash;38% cardioversion rate &mdash; lower than procainamide. Familiar from ACLS. Main acute concern: hypotension. AHA/ACC/HRS 2017: Class IIb.','PROCAMIO (Ortiz 2017); Marill 2010; AHA/ACC/HRS 2017');
+    h+=d('Lidocaine IV (Class 1B)','second','1&ndash;1.5 mg/kg IV; repeat q5 min to max 3 mg/kg.\nInfusion: 1&ndash;4 mg/min.','10&ndash;25% cardioversion rate &mdash; inferior to procainamide and amiodarone. Advantages: rapid push, prefilled syringes, minimal hypotension. Acts on ischaemic tissue (pH-dependent). Three observational studies confirm inferiority for stable VT.','Gorgels 1996; Manz 1988; Ho 1994');
+    h+=d('Sotalol IV (Class III)','second','1&ndash;1.5 mg/kg IV over 5 min (where available).\nOral: 80&ndash;160 mg BID for prevention.','Ho 1994 RCT: IV sotalol superior to lidocaine for stable VT. IV form not widely available in North America. AHA/ACC/HRS 2017: Class IIb.','Ho 1994; AHA/ACC/HRS 2017');
+    if(c==='post_mi')h+=al('warn','&#9888;','Post-MI stable VT: Do NOT use lidocaine for prophylaxis &mdash; meta-analysis (Hine 1989) demonstrates harmful trend. Reserve for acute VT termination as second-line agent only.');
+    h+=al('info','&#9432;','<strong>AHA/ACC/HRS 2017:</strong> Procainamide &mdash; Class IIa. Amiodarone/Sotalol &mdash; Class IIb. Synchronised DCCV appropriate at any time.');
+  }
+  else if(t==='tdp'){
+    if(!c){h+=al('info','&#9432;','Select additional context above.');return h;}
+    h+=al('danger','&#128683;','<strong>Immediate actions (parallel):</strong><br>1. Stop ALL QT-prolonging medications (CredibleMeds/AZCERT)<br>2. Correct hypokalaemia &mdash; target K&#x207a; >4.0 mEq/L<br>3. Correct hypomagnesaemia<br>4. Identify underlying cause (bradycardia, drug-induced, inherited LQTS)<br>5. Haemodynamically unstable: synchronised DCCV immediately');
+    h+=sl('Pharmacotherapy');
+    h+=d('Magnesium sulfate IV','first','Stable TdP: 1&ndash;2 g IV over 15 min.\nUnstable TdP: rapid IV push.\nRate adjusted for haemodynamic tolerance.','First-line despite absence of RCT data. Prevents TdP reinitiation (does not reliably terminate). Mechanism: Ca&#xB2;&#x207a; channel antagonism + prevention of early after-depolarisations (EADs). NOT recommended for monomorphic VT or VF. Give regardless of serum Mg&#xB2;&#x207a; level.','Thomas 2016; AHA ACLS 2020');
+    h+=al('warn','&#9888;','<strong>Pause-dependent TdP:</strong> Increase heart rate to &#8805;100 bpm to shorten QT and suppress long pauses during which ventricular ectopy initiates TdP.');
+    h+=d('Isoproterenol IV','first','Bolus: 20&ndash;60 &mu;g initially, then 10&ndash;20 &mu;g.\nInfusion: 1&ndash;20 &mu;g/min titrated to HR &#8805;100 bpm.','For pause-dependent / bradycardia-related TdP. &beta;&#x2081; stimulation &#8593; HR, shortens QT, suppresses EADs. Mild hypotension at low doses offset by &#8593; CO.','Khan 2002; AHA/ACC/HRS 2017');
+    h+=d('Overdrive pacing (transcutaneous / transvenous)','first','Rate 80&ndash;120 bpm to suppress pause-dependent ectopy.\nTranscutaneous: immediate but uncomfortable (sedation required).\nTransvenous: more definitive.','Alternative to isoproterenol. Preferred for sustained therapy.','Charlton 2010; AHA 2017');
+    h+=d('Lidocaine IV (Class 1B)','second','1&ndash;1.5 mg/kg IV; infusion 1&ndash;4 mg/min.','No QT-prolonging effect. No prospective TdP data but mechanistically reasonable.','AJHP 2023 Part 2');
+    h+=d('Amiodarone IV','second','150 mg IV over 10&ndash;15 min (low dose, if other options exhausted).','Low actual TdP risk despite QT prolongation (QT dispersion mechanism). Not 1st-line for TdP &mdash; may be considered when other options unavailable.','Shenthar 2017; ESC EHRA 2025');
+    h+=d('Procainamide IV','avoid','&mdash;','CONTRAINDICATED for TdP &mdash; prolongs QT and can exacerbate TdP. Neither amiodarone nor procainamide recommended as initial therapy.','AHA/ACC/HRS 2017; AJHP 2023');
+  }
+  return h;
+}
+
+function bradyRec(){
+  var t=S.bType,h='';
+  if(t==='av_block1'){
+    h+=al('info','&#9432;','<strong>1st-degree AV block (PR >200 ms):</strong> Conduction delayed but complete each cycle. Typically incidental ECG finding. Rarely causes symptomatic bradycardia.');
+    h+=al('ok','&#10022;','<strong>No pharmacological therapy indicated in most cases.</strong> Identify reversible causes: AV nodal blocking medications, electrolyte abnormalities, hypothyroidism, inferior MI, Lyme disease. Monitor for progression to higher-degree block.');
+  }
+  else if(t==='sinus_brady'||t==='av_block2'){
+    h+=al('info','&#9432;','<strong>Treat only if symptomatic</strong> (HR typically &#60;50 bpm + haemodynamic instability / symptoms). Identify and reverse causes first.');
+    if(t==='av_block2')h+=al('warn','&#9888;','<strong>Mobitz type II:</strong> Unpredictable progression to complete heart block &mdash; lower threshold for pacing than Mobitz I. Atropine less effective if block is infranodal. Pacing readiness is essential.');
+    h+=sl('First-line pharmacotherapy');
+    h+=d('Atropine IV','first','0.5&ndash;1 mg IV push; repeat q3&ndash;5 min up to 3 mg total (max 0.04 mg/kg).\nAHA 2020 ACLS recommends 1 mg.','Vagolytic &mdash; first-line for symptomatic bradycardia. Most effective for sinus bradycardia and Mobitz I. Less effective for infranodal block (diseased nodal tissue). <strong>Avoid in heart transplant recipients</strong> (unpredictable complete AV block). Onset 1&ndash;10 min.','AHA 2020 ACLS; ACC/AHA/HRS Bradycardia Guideline 2018');
+    h+=sl('Second-line / bridging agents');
+    h+=d('Dopamine IV','second','Start 5 &mu;g/kg/min; &#8593; by 5 &mu;g/kg/min q2 min to max 20 &mu;g/kg/min.\nDose ranges: 3&ndash;10 &mu;g/kg/min (inotropy/chronotropy); >10 (vasoconstriction).','Most utilised adrenergic agent for bradycardia. Dose-dependent receptor effects. Prehospital RCT (Morrison 2008): no significant survival difference vs transcutaneous pacing.','ACC/AHA/HRS 2018; Morrison 2008');
+    h+=d('Epinephrine IV','second','Infusion: 2&ndash;10 &mu;g/min or 0.01&ndash;0.5 &mu;g/kg/min.\nPush-dose: 5&ndash;20 &mu;g q3&ndash;5 min\n(prepare: 1 mg/10 mL diluted 1 mL in 9 mL NS = 10 &mu;g/mL).','Push-dose: primarily for hypotension. Chronotropy at lower doses than vasopressor doses. <strong>High medication error risk</strong> with push-dose preparation &mdash; careful labelling essential (AHA 2020 caution).','AHA ACLS 2020; Cole 2019 (medication errors)');
+    h+=d('Dobutamine IV','second','2&ndash;10 &mu;g/kg/min infusion.\nInitiate &#8805;5 &mu;g/kg/min for chronotropy/inotropy.','Positive inotropy + chronotropy. Mild initial hypotension (&alpha;&#x2082; effect) offset by &#8593; CO. Useful when bradycardia + impaired CO.','ACC/AHA/HRS 2018');
+    h+=d('Isoproterenol IV','second','Bolus: 20&ndash;60 &mu;g; then infusion 1&ndash;20 &mu;g/min (or 0.1&ndash;1.0 &mu;g/kg/min).','Pure &beta;-agonist &mdash; chronotropy + inotropy with peripheral vasodilation. Tachyarrhythmia risk at higher doses.','ACC/AHA/HRS 2018');
+    h+=d('Glycopyrrolate IV','second','0.1 mg IV; repeat q2&ndash;3 min as needed.','Adjunct after maximum atropine dose. Antimuscarinic with longer t&#xBD; (19 min; prolonged in renal insufficiency). 85% renally eliminated as active drug.','Yun 2021; Mirakhur 1983; AJHP 2023');
+    h+=dv();
+    h+=al('warn','&#9888;','<strong>Transcutaneous pacing (TCP):</strong> Initiate if pharmacologically refractory. Increase mA until electrical + mechanical capture confirmed. <strong>Sedation essential</strong> for patient comfort. Transvenous pacing as bridge to permanent pacemaker if indicated.');
+  }
+  else if(t==='av_block3'){
+    h+=al('danger','&#128683;','<strong>Complete heart block:</strong> Life-threatening. Ventricular escape 20&ndash;60 bpm. Priority: secure pacing. Pharmacotherapy is a bridge only. Identify reversible causes: inferior MI (RCA &rarr; AV node), Lyme disease, hyperkalemia, drug toxicity.');
+    h+=sl('Bridge pharmacotherapy (while preparing pacing)');
+    h+=d('Atropine IV','first','1 mg IV push; repeat q3&ndash;5 min up to 3 mg.','Temporary benefit in nodal (supra-Hisian) block only. <strong>LIMITED or NO utility in infranodal block</strong> &mdash; may paradoxically worsen. Do NOT rely on atropine alone. Pacing is definitive.','ACC/AHA/HRS 2018; Brady 1999');
+    h+=d('Dopamine IV / Epinephrine IV','first','Dopamine: 5&ndash;20 &mu;g/kg/min.\nEpinephrine infusion: 2&ndash;10 &mu;g/min.','Temporary CO support while pacing is prepared. May modestly increase ventricular escape rate.','ACC/AHA/HRS 2018');
+    h+=d('Transcutaneous pacing (TCP)','first','Immediate &mdash; first-line definitive treatment.\nSet rate &rarr; increase mA to capture &rarr; confirm mechanical capture.\nSedation required.','Definitive first-line treatment. Transvenous pacing once stabilised &mdash; more comfortable, reliable bridge to permanent pacemaker.','AHA ACLS 2020; ACC/AHA/HRS 2018');
+    h+=al('warn','&#9888;','Do not delay pacing for pharmacological trials in haemodynamically compromised patients. Atropine/adrenergic agents unreliable in infranodal block &mdash; pacing is non-negotiable.');
+  }
+  else if(t==='post_transplant'){
+    h+=al('danger','&#128683;','<strong>AVOID ATROPINE</strong> in post-cardiac transplant patients. Vagal denervation causes unpredictable complete AV block or sinus arrest with atropine &mdash; dose-independent (Bernheim 2004: 50% rate of complete AV block or sinus arrest).');
+    h+=al('warn','&#9888;','<strong>Also avoid in spinal cord injury (SCI) bradycardia:</strong> Vagal hyperactivity with disrupted sympathetic tone &mdash; agents dependent on intact autonomic function may have unpredictable effects.');
+    h+=sl('First-line: methylxanthines');
+    h+=d('Aminophylline IV (methylxanthine)','first','Bolus: 250 mg IV push.\nOr 6 mg/kg in 100 mL IV over 20&ndash;30 min.\nThen oral theophylline 5&ndash;10 mg/kg titrated to effect or serum levels.','Drug of choice post-transplant and SCI bradycardia. Adenosine receptor antagonist &mdash; increases SA node automaticity without requiring intact vagal innervation. Chronotropy at theophylline levels as low as 5 &mu;g/mL. Avoids pacemaker while native SA node function recovers.','Bertolet 1996 (J Am Coll Cardiol); AJHP 2023 Part 2');
+    h+=d('Theophylline IV / oral','first','IV: 300 mg then oral 5&ndash;10 mg/kg titrated.\nt&#xBD; = 8.7 h in adults &mdash; monitor serum levels.','Same mechanism as aminophylline. Hepatically metabolised including to caffeine.','Perrine 2022; AJHP 2023 Part 2');
+    h+=sl('Second-line');
+    h+=d('Dopamine IV','second','5&ndash;20 &mu;g/kg/min.','Receptor-mediated &mdash; less dependent on intact vagal innervation. Bridge to pacing if methylxanthines insufficient.','ACC/AHA/HRS 2018');
+    h+=d('Transcutaneous &rarr; transvenous pacing','second','Temporary pacing if pharmacotherapy fails.','Definitive bridge. Consider permanent pacemaker if SA node function does not recover.','ACC/AHA/HRS 2018');
+  }
+  return h;
+}
+
+function render(){
+  var content='';
+  if(S.cat==='atrial')content=atrialRec();
+  else if(S.cat==='ventricular')content=ventRec();
+  else if(S.cat==='brady')content=bradyRec();
+  if(!content)return;
+  var lbl=getLabel();
+  var r=document.getElementById('results');
+  r.innerHTML='<div class="rh"><h2>Drug recommendations</h2>'+(lbl?'<span class="arlbl">'+lbl+'</span>':'')+'</div>'+content;
+  r.classList.add('vis');
+  r.scrollIntoView({behavior:'smooth',block:'start'});
+}
+</script>
+</body>
+</html>
